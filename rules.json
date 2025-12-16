@@ -1,0 +1,41 @@
+{
+	"rules": {
+		"users": {
+			"$uid": {
+				".read": "auth != null",
+				".write": "auth != null && auth.uid === $uid",
+				"email": { ".read": false },
+				"private": { ".read": false }
+			}
+		},
+		"usernames": {
+			"$username": {
+				".read": true,
+				".write": "auth != null && !data.exists()"
+			}
+		},
+		"friends": {
+			"$uid": {
+				".read": "auth != null && auth.uid === $uid",
+				"$friendUid": {
+					".write": "auth != null && (auth.uid === $uid || auth.uid === $friendUid)"
+				}
+			}
+		},
+		"friend_requests": {
+			"$uid": {
+				".read": "auth != null && auth.uid === $uid",
+				"$senderUid": {
+					".read": "auth != null && auth.uid === $senderUid",
+					".write": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)"
+				}
+			}
+		},
+		"status": {
+			"$uid": {
+				".read": "auth != null",
+				".write": "auth != null && auth.uid === $uid"
+			}
+		}
+	}
+}
