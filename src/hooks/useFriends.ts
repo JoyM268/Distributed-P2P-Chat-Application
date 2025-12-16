@@ -1,15 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { db } from "@/services/firebase";
 import { ref, onValue, get, child } from "firebase/database";
-
-interface FriendProfile {
-	uid: string;
-	name?: string;
-	username?: string;
-	avatar?: string;
-	status?: string;
-	[key: string]: any;
-}
+import type { FriendProfile } from "@/types";
 
 const useFriends = ({ currentUserId }: { currentUserId: string | null }) => {
 	const [friends, setFriends] = useState<FriendProfile[]>([]);
@@ -80,6 +72,11 @@ const useFriends = ({ currentUserId }: { currentUserId: string | null }) => {
 								const statusData = statusSnap.val();
 								const newStatus =
 									statusData?.state || "Offline";
+
+								console.log(`Status update for ${profile.name} (${profile.uid}):`, {
+									statusData,
+									newStatus
+								});
 
 								setFriends((prevFriends) =>
 									prevFriends.map((f) =>

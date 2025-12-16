@@ -3,8 +3,9 @@ import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import SelectPeerMessage from "@/components/SelectPeerMessage";
 import { useState } from "react";
-import type { UserMessageInterface } from "@/types";
-import { messageData } from "@/data/dummy";
+import useWebRTC from "@/hooks/useWebRTC";
+import useFriends from "@/hooks/useFriends";
+import { useAuth } from "@/context/AuthContext";
 
 export default function UserChat({
 	toggleLogoutWarning,
@@ -15,8 +16,14 @@ export default function UserChat({
 }) {
 	const [sidebar, setSidebar] = useState<boolean>(true);
 	const [selectedUser, setSelectedUser] = useState<string | null>(null);
-	const [userMessage, setUserMessage] = useState<UserMessageInterface | null>(
-		null
+	const { currentUser } = useAuth();
+	const { friends, loading } = useFriends({
+		currentUserId: currentUser?.uid || null,
+	});
+
+	const { sendMessage, messages } = useWebRTC(
+		currentUser?.uid || null,
+		friends
 	);
 
 	function toggleSidebar() {
@@ -26,36 +33,24 @@ export default function UserChat({
 	function selectUser(uid: string) {
 		if (selectedUser && selectedUser === uid) {
 			setSelectedUser(null);
-			setUserMessage(null);
 			return;
 		}
 		setSelectedUser(uid);
-		setUserMessage(messageData.find((u) => u.uid === uid) || null);
 	}
 
-	function sendMessage(content: string) {
-		const now = new Date();
-
-		const timeString = now.toLocaleString("en-US", {
-			hour: "numeric",
-			minute: "numeric",
-			hour12: true,
-		});
-
-		const newMessage = {
-			sent: true,
-			content,
-			time: timeString,
-		};
-
-		setUserMessage((prev) => {
-			if (!prev) return prev;
-
-			return {
-				...prev,
-				message: [...prev.message, newMessage],
-			};
-		});
+	function handleSend(content: string) {
+		console.log("handleSend called with:", { selectedUser, content });
+		if (selectedUser && content.trim()) {
+			console.log("Calling sendMessage with selectedUser:", selectedUser);
+			sendMessage(selectedUser, content.trim());
+		} else {
+			console.log(
+				"Not sending - selectedUser:",
+				selectedUser,
+				"content:",
+				content
+			);
+		}
 	}
 
 	return (
@@ -67,15 +62,19 @@ export default function UserChat({
 						selectUser={selectUser}
 						toggleLogoutWarning={toggleLogoutWarning}
 						selectedUser={selectedUser}
+						friends={friends}
+						loading={loading}
 					/>
 				)}
 			</AnimatePresence>
-			{userMessage ? (
+			{selectedUser ? (
 				<Chat
 					toggleSidebar={toggleSidebar}
-					userMessage={userMessage}
+					userMessage={messages}
 					sidebar={sidebar}
-					sendMessage={sendMessage}
+					sendMessage={handleSend}
+					selectedUser={selectedUser}
+					friends={friends}
 				/>
 			) : (
 				<SelectPeerMessage

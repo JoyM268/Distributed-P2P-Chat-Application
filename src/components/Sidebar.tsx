@@ -7,17 +7,22 @@ import { db } from "@/services/firebase";
 import { ref, get, child } from "firebase/database";
 import DiscoveredPeers from "./DiscoveredPeers";
 import HandlePeers from "./RequestPeers";
+import type { FriendProfile } from "@/types";
 
 function Sidebar({
 	isOpen,
 	selectUser,
 	toggleLogoutWarning,
 	selectedUser,
+	loading,
+	friends,
 }: {
 	isOpen: boolean;
 	selectUser: (uid: string) => void;
 	selectedUser: string | null;
 	toggleLogoutWarning: () => void;
+	loading: boolean;
+	friends: FriendProfile[];
 }) {
 	const [username, setUsername] = useState<string>("");
 	const { currentUser } = useAuth();
@@ -75,6 +80,8 @@ function Sidebar({
 				<DiscoveredPeers
 					selectUser={selectUser}
 					selectedFriendId={selectedUser}
+					friends={friends}
+					loading={loading}
 				/>
 			) : (
 				<HandlePeers />

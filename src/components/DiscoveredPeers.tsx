@@ -2,21 +2,19 @@ import { Input } from "./ui/input";
 import { SearchIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import useFriends from "@/hooks/useFriends";
-import { useAuth } from "@/context/AuthContext";
+import type { FriendProfile } from "@/types";
 
 export default function DiscoveredPeers({
 	selectUser,
 	selectedFriendId,
+	friends,
+	loading,
 }: {
 	selectUser: (uid: string) => void;
 	selectedFriendId?: string | null;
+	friends: FriendProfile[];
+	loading: boolean;
 }) {
-	const { currentUser } = useAuth();
-	const { friends, loading } = useFriends({
-		currentUserId: currentUser?.uid || null,
-	});
-
 	const [search, setSearch] = useState<string>("");
 
 	const userSearch = useMemo(() => {

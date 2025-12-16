@@ -11,3 +11,19 @@ export interface UserMessageInterface {
 	img?: string | null;
 	message: messageInterface[];
 }
+
+export interface FriendProfile {
+	uid: string;
+	name?: string;
+	username?: string;
+	avatar?: string;
+	status?: string;
+	[key: string]: any;
+}
+
+export interface WebRTCMessage {
+	senderId: string;
+	receiverId?: string;
+	content: string;
+	timestamp: number;
+}

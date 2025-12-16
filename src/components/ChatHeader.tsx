@@ -1,16 +1,23 @@
-import type { UserMessageInterface } from "@/types";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import type { FriendProfile } from "@/types";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { ChevronLeft, ChevronRight, Wifi, WifiOff } from "lucide-react";
+import { useMemo } from "react";
 
 function ChatHeader({
 	toggleSidebar,
-	userMessage,
 	sidebar,
+	selectedUser,
+	friends,
 }: {
 	toggleSidebar: () => void;
-	userMessage: UserMessageInterface;
 	sidebar: boolean;
+	selectedUser: string | null;
+	friends: FriendProfile[];
 }) {
+	const friend = useMemo(() => {
+		return friends.find((f) => f.uid === selectedUser);
+	}, [friends, selectedUser]);
+
 	return (
 		<div className="flex justify-between py-2 border-b border-gray-400 px-3 sticky top-0 bg-white shrink-0 overflow-hidden">
 			<div className="flex items-center gap-3">
@@ -23,35 +30,30 @@ function ChatHeader({
 				<div className="flex items-center gap-4">
 					<Avatar
 						className="w-10 h-10 border border-gray-400 text-black"
-						key={userMessage.img ?? userMessage.name}
+						key={friend?.status}
 					>
-						{userMessage.img && (
-							<AvatarImage
-								src={userMessage.img}
-								alt={userMessage.name}
-							/>
-						)}
 						<AvatarFallback className="text-black">
-							{userMessage.name.charAt(0)}
+							{friend?.username &&
+								friend.username.toLocaleUpperCase().charAt(0)}
 						</AvatarFallback>
 					</Avatar>
 					<div className="flex flex-col gap-0.5">
 						<span className="font-semibold">
-							{userMessage.name}
+							{friend?.username}
 						</span>
 						<span
 							className={`flex text-xs ${
-								userMessage.status === "Online"
+								friend?.status === "Online"
 									? "text-green-600"
 									: "text-red-600"
 							} gap-1`}
 						>
-							{userMessage.status === "Online" ? (
+							{friend?.status === "Online" ? (
 								<Wifi className="w-4 h-4" />
 							) : (
 								<WifiOff className="w-4 h-4" />
 							)}
-							{userMessage.status}
+							{friend?.status}
 						</span>
 					</div>
 				</div>
