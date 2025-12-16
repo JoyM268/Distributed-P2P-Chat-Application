@@ -4,8 +4,12 @@
 			"$uid": {
 				".read": "auth != null",
 				".write": "auth != null && auth.uid === $uid",
-				"email": { ".read": false },
-				"private": { ".read": false }
+				"email": {
+					".read": false
+				},
+				"private": {
+					".read": false
+				}
 			}
 		},
 		"usernames": {
@@ -35,6 +39,14 @@
 			"$uid": {
 				".read": "auth != null",
 				".write": "auth != null && auth.uid === $uid"
+			}
+		},
+		"signaling": {
+			"$receiverUid": {
+				".read": "auth != null && auth.uid === $receiverUid",
+				"$signalId": {
+					".write": "auth != null"
+				}
 			}
 		}
 	}
