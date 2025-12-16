@@ -9,12 +9,16 @@ import AddPeers from "./components/AddPeers";
 import { useAuth } from "./context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/services/firebase";
+import usePresence from "./hooks/usePresence";
+import { ref, set, serverTimestamp } from "firebase/database";
+import { db } from "@/services/firebase"; // Adjust path as needed
 
 function App() {
 	const [option, setOption] = useState<"main" | "login" | "signup">("main");
 	const [logoutWarning, setLogoutWarning] = useState<boolean>(false);
 	const [addPeers, setAddPeers] = useState<boolean>(false);
 	const { currentUser, authLoading } = useAuth();
+	usePresence();
 
 	function changeOption(newOption: "main" | "login" | "signup") {
 		if (option !== newOption) {
@@ -24,9 +28,17 @@ function App() {
 
 	async function logout() {
 		try {
+			if (auth.currentUser) {
+				const userStatusRef = ref(db, `status/${auth.currentUser.uid}`);
+
+				await set(userStatusRef, {
+					state: "Offline",
+					last_changed: serverTimestamp(),
+				});
+			}
 			await signOut(auth);
-		} catch (err) {
-			console.log(err);
+		} catch (error) {
+			console.error("Error logging out:", error);
 		}
 	}
 

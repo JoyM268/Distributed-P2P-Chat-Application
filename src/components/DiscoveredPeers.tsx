@@ -13,7 +13,9 @@ export default function DiscoveredPeers({
 	selectedFriendId?: string | null;
 }) {
 	const { currentUser } = useAuth();
-	const { friends, loading } = useFriends(currentUser?.uid ?? null);
+	const { friends, loading } = useFriends({
+		currentUserId: currentUser?.uid || null,
+	});
 
 	const [search, setSearch] = useState<string>("");
 

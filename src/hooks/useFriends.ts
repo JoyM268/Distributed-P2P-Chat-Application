@@ -1,5 +1,4 @@
-// useFriends.ts
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { db } from "@/services/firebase";
 import { ref, onValue, get, child } from "firebase/database";
 
@@ -12,81 +11,103 @@ interface FriendProfile {
 	[key: string]: any;
 }
 
-const useFriends = (currentUserId: string | null) => {
+const useFriends = ({ currentUserId }: { currentUserId: string | null }) => {
 	const [friends, setFriends] = useState<FriendProfile[]>([]);
 	const [loading, setLoading] = useState(true);
 
+	const unsubscribeListRef = useRef<(() => void) | null>(null);
+	const statusUnsubsRef = useRef<(() => void)[]>([]);
+
 	useEffect(() => {
 		if (!currentUserId) {
-			setFriends([]);
-			setLoading(false);
-			return;
+			const timeoutId = setTimeout(() => {
+				setFriends([]);
+				setLoading(false);
+			}, 0);
+			return () => clearTimeout(timeoutId);
 		}
 
-		setLoading(true);
+		const initTimer = setTimeout(() => {
+			setLoading(true);
+			const friendsListRef = ref(db, `friends/${currentUserId}`);
+			const unsubscribeFriendsList = onValue(
+				friendsListRef,
+				async (snapshot) => {
+					statusUnsubsRef.current.forEach((unsub) => unsub());
+					statusUnsubsRef.current = [];
 
-		const friendsListRef = ref(db, `friends/${currentUserId}`);
+					const friendsData = snapshot.val();
 
-		const unsubscribe = onValue(
-			friendsListRef,
-			async (snapshot) => {
-				if (!snapshot.exists()) {
-					setFriends([]);
-					setLoading(false);
-					return;
-				}
+					if (!friendsData) {
+						setFriends([]);
+						setLoading(false);
+						return;
+					}
 
-				const friendsData = snapshot.val();
-				if (typeof friendsData !== "object") {
-					setFriends([]);
-					setLoading(false);
-					return;
-				}
+					const friendUids = Object.keys(friendsData);
 
-				const friendUids = Object.keys(friendsData);
-
-				try {
-					const profiles = await Promise.all(
-						friendUids.map(async (uid) => {
-							const userRef = child(ref(db), `users/${uid}`);
-							const userSnap = await get(userRef);
-
-							if (!userSnap.exists()) {
+					try {
+						const profiles = await Promise.all(
+							friendUids.map(async (uid) => {
+								const userSnap = await get(
+									child(ref(db), `users/${uid}`)
+								);
+								if (userSnap.exists()) {
+									const val = userSnap.val();
+									return {
+										uid,
+										...val,
+										name:
+											val.username || val.name || "Guest",
+										status: "Offline",
+									};
+								}
 								return {
 									uid,
-									name: "Unknown User",
-									status: "offline",
+									name: "Guest",
+									status: "Offline",
 								};
-							}
+							})
+						);
 
-							const userData = userSnap.val();
+						setFriends(profiles);
+						setLoading(false);
 
-							return {
-								uid,
-								...userData,
-								name:
-									userData.username ||
-									userData.name ||
-									"Unknown User",
-								status: userData.status || "offline",
-							};
-						})
-					);
+						profiles.forEach((profile) => {
+							const statusRef = ref(db, `status/${profile.uid}`);
 
-					setFriends(profiles);
-				} catch (error) {
-					console.error("Error fetching friend profiles:", error);
-				} finally {
-					setLoading(false);
+							const unsub = onValue(statusRef, (statusSnap) => {
+								const statusData = statusSnap.val();
+								const newStatus =
+									statusData?.state || "Offline";
+
+								setFriends((prevFriends) =>
+									prevFriends.map((f) =>
+										f.uid === profile.uid
+											? { ...f, status: newStatus }
+											: f
+									)
+								);
+							});
+
+							statusUnsubsRef.current.push(unsub);
+						});
+					} catch (error) {
+						console.error("Error loading friends:", error);
+						setLoading(false);
+					}
 				}
-			},
-			(error) => {
-				console.error("Firebase Read Error:", error);
-				setLoading(false);
-			}
-		);
+			);
 
-		return () => unsubscribe();
+			unsubscribeListRef.current = unsubscribeFriendsList;
+		}, 0);
+
+		return () => {
+			clearTimeout(initTimer);
+			if (unsubscribeListRef.current) unsubscribeListRef.current();
+			statusUnsubsRef.current.forEach((unsub) => unsub());
+			statusUnsubsRef.current = [];
+		};
 	}, [currentUserId]);
 
 	return { friends, loading };
