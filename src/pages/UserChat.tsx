@@ -3,12 +3,8 @@ import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import SelectPeerMessage from "@/components/SelectPeerMessage";
 import { useState } from "react";
-import type {
-	UserInterface,
-	ProfileInterface,
-	UserMessageInterface,
-} from "@/types";
-import { userData, profileData, messageData } from "@/data/dummy";
+import type { UserMessageInterface } from "@/types";
+import { messageData } from "@/data/dummy";
 
 export default function UserChat({
 	toggleLogoutWarning,
@@ -18,8 +14,7 @@ export default function UserChat({
 	toggleAddPeers: () => void;
 }) {
 	const [sidebar, setSidebar] = useState<boolean>(true);
-	const [users, setUsers] = useState<UserInterface[]>(userData);
-	const [profile, setProfile] = useState<ProfileInterface>(profileData);
+	const [selectedUser, setSelectedUser] = useState<string | null>(null);
 	const [userMessage, setUserMessage] = useState<UserMessageInterface | null>(
 		null
 	);
@@ -28,12 +23,14 @@ export default function UserChat({
 		setSidebar((sidebar) => !sidebar);
 	}
 
-	function selectUser(user: string) {
-		if (userMessage !== null && user == userMessage.name) {
+	function selectUser(uid: string) {
+		if (selectedUser && selectedUser === uid) {
+			setSelectedUser(null);
 			setUserMessage(null);
 			return;
 		}
-		setUserMessage(messageData.find((u) => u.name === user) || null);
+		setSelectedUser(uid);
+		setUserMessage(messageData.find((u) => u.uid === uid) || null);
 	}
 
 	function sendMessage(content: string) {
@@ -67,11 +64,9 @@ export default function UserChat({
 				{sidebar && (
 					<Sidebar
 						isOpen={sidebar}
-						users={users}
 						selectUser={selectUser}
-						userMessage={userMessage}
-						profile={profile}
 						toggleLogoutWarning={toggleLogoutWarning}
+						selectedUser={selectedUser}
 					/>
 				)}
 			</AnimatePresence>

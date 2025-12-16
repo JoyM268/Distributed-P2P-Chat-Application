@@ -2,10 +2,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { signInWithEmailAndPassword, auth } from "@/services/firebase";
+import { FirebaseError } from "firebase/app";
 
 export default function Login() {
-	const [username, setUsername] = useState<string>("");
+	const [email, setEmail] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
+	const [loading, setLoading] = useState<boolean>(false);
+
+	async function handleSubmit() {
+		setLoading(true);
+		try {
+			const userCredential = await signInWithEmailAndPassword(
+				auth,
+				email,
+				password
+			);
+			console.log("Successfully Logged In", userCredential.user.uid);
+		} catch (err) {
+			if (err instanceof FirebaseError) {
+				console.log(err.message);
+			} else {
+				console.log("Error Occured");
+			}
+		} finally {
+			setLoading(false);
+		}
+	}
 
 	return (
 		<div className="pt-32 flex flex-col w-full text-center items-center gap-6">
@@ -17,12 +40,12 @@ export default function Login() {
 			</div>
 			<div className="max-w-7xl min-w-sm flex flex-col gap-5">
 				<div className="flex flex-col gap-1">
-					<Label htmlFor="username">Username</Label>
+					<Label htmlFor="email">Email</Label>
 					<Input
-						id="username"
-						value={username}
-						placeholder="Username"
-						onChange={(e) => setUsername(e.target.value)}
+						id="email"
+						value={email}
+						placeholder="Email"
+						onChange={(e) => setEmail(e.target.value)}
 					/>
 				</div>
 				<div className="flex flex-col gap-1">
@@ -35,8 +58,12 @@ export default function Login() {
 						placeholder="Password"
 					/>
 				</div>
-				<Button className="bg-blue-500 mt-1 cursor-pointer hover:bg-blue-500/85">
-					Login
+				<Button
+					className="bg-blue-500 mt-1 cursor-pointer hover:bg-blue-500/85"
+					onClick={handleSubmit}
+					disabled={loading}
+				>
+					{loading ? "Loading..." : "Login"}
 				</Button>
 			</div>
 			<div className="text-gray-600 text-xs -mt-3">

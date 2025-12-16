@@ -1,14 +1,3 @@
-export interface UserInterface {
-	name: string;
-	status: "Online" | "Offline";
-	img?: string | null;
-}
-
-export interface ProfileInterface {
-	name: string;
-	img: string | null;
-}
-
 export interface messageInterface {
 	sent: boolean;
 	content: string;
@@ -16,6 +5,7 @@ export interface messageInterface {
 }
 
 export interface UserMessageInterface {
+	uid: string;
 	name: string;
 	status: "Online" | "Offline";
 	img?: string | null;
