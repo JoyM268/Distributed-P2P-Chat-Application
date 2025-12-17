@@ -2,7 +2,7 @@ import type { WebRTCMessage } from "@/types";
 
 const DB_NAME = "p2p_chat_db";
 const STORE_NAME = "messages";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const initDB = (): Promise<IDBDatabase> => {
 	return new Promise((resolve, reject) => {
@@ -17,30 +17,45 @@ export const initDB = (): Promise<IDBDatabase> => {
 		request.onupgradeneeded = (event) => {
 			const db = (event.target as IDBOpenDBRequest).result;
 
+			let store: IDBObjectStore;
 			if (!db.objectStoreNames.contains(STORE_NAME)) {
-				const store = db.createObjectStore(STORE_NAME, {
+				store = db.createObjectStore(STORE_NAME, {
 					keyPath: "id",
 					autoIncrement: true,
 				});
+			} else {
+				store = (
+					event.target as IDBOpenDBRequest
+				).transaction!.objectStore(STORE_NAME);
+			}
 
-				store.createIndex("conversationId", "conversationId", {
-					unique: false,
-				});
+			if (!store.indexNames.contains("timestamp")) {
 				store.createIndex("timestamp", "timestamp", { unique: false });
+			}
+
+			if (!store.indexNames.contains("user_conversation")) {
+				store.createIndex(
+					"user_conversation",
+					["ownerId", "conversationId"],
+					{ unique: false }
+				);
 			}
 		};
 	});
 };
 
 export const saveMessageToDB = async (
+	ownerId: string,
 	conversationId: string,
 	message: WebRTCMessage
 ) => {
+	if (!ownerId) return;
+
 	const db = await initDB();
 	return new Promise<void>((resolve, reject) => {
 		const transaction = db.transaction([STORE_NAME], "readwrite");
 		const store = transaction.objectStore(STORE_NAME);
-		const record = { ...message, conversationId };
+		const record = { ...message, ownerId, conversationId };
 
 		const request = store.add(record);
 
@@ -50,15 +65,18 @@ export const saveMessageToDB = async (
 };
 
 export const getHistoryFromDB = async (
+	ownerId: string,
 	conversationId: string
 ): Promise<WebRTCMessage[]> => {
+	if (!ownerId) return [];
+
 	const db = await initDB();
 	return new Promise((resolve, reject) => {
 		const transaction = db.transaction([STORE_NAME], "readonly");
 		const store = transaction.objectStore(STORE_NAME);
-		const index = store.index("conversationId");
+		const index = store.index("user_conversation");
 
-		const request = index.getAll(conversationId);
+		const request = index.getAll([ownerId, conversationId]);
 
 		request.onsuccess = () => {
 			const results = request.result as WebRTCMessage[];

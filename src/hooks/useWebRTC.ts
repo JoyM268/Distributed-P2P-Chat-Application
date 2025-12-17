@@ -69,14 +69,17 @@ export default function useWebRTC(
 					};
 
 					setMessages((prev) => [...prev, msg]);
-					await saveMessageToDB(peerId, msg);
-					console.log(`Received & Saved message from ${peerId}`);
+
+					if (currentUserId) {
+						await saveMessageToDB(currentUserId, peerId, msg);
+						console.log(`Received & Saved message from ${peerId}`);
+					}
 				} catch (e) {
 					console.error("Failed to parse or save message", e);
 				}
 			};
 		},
-		[]
+		[currentUserId]
 	);
 
 	const createPeerConnection = useCallback(
@@ -207,33 +210,38 @@ export default function useWebRTC(
 		return () => off(signalingRef);
 	}, [currentUserId, handleSignal]);
 
-	const sendMessage = useCallback(async (peerId: string, content: string) => {
-		const channel = channelsRef.current[peerId];
+	const sendMessage = useCallback(
+		async (peerId: string, content: string) => {
+			const channel = channelsRef.current[peerId];
 
-		if (channel && channel.readyState === "open") {
-			const timestamp = Date.now();
-			const msgPayload = { content, timestamp };
+			if (channel && channel.readyState === "open") {
+				const timestamp = Date.now();
+				const msgPayload = { content, timestamp };
 
-			channel.send(JSON.stringify(msgPayload));
+				channel.send(JSON.stringify(msgPayload));
 
-			const myMsg: WebRTCMessage = {
-				senderId: "me",
-				receiverId: peerId,
-				content,
-				timestamp,
-			};
+				const myMsg: WebRTCMessage = {
+					senderId: "me",
+					receiverId: peerId,
+					content,
+					timestamp,
+				};
 
-			setMessages((prev) => [...prev, myMsg]);
+				setMessages((prev) => [...prev, myMsg]);
 
-			await saveMessageToDB(peerId, myMsg);
-			console.log(`Sent & Saved message to ${peerId}`);
+				if (currentUserId) {
+					await saveMessageToDB(currentUserId, peerId, myMsg);
+					console.log(`Sent & Saved message to ${peerId}`);
+				}
 
-			return true;
-		} else {
-			console.warn(`Cannot send to ${peerId}: Channel not open`);
-			return false;
-		}
-	}, []);
+				return true;
+			} else {
+				console.warn(`Cannot send to ${peerId}: Channel not open`);
+				return false;
+			}
+		},
+		[currentUserId]
+	);
 
 	return { sendMessage, messages };
 }

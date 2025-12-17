@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { getHistoryFromDB } from "@/services/chatHistory";
+import { useAuth } from "@/context/AuthContext";
 import type { WebRTCMessage } from "@/types";
 
 export default function useChatHistory(selectedFriendId: string | null) {
+	const { currentUser } = useAuth();
+
 	const [fetchedData, setFetchedData] = useState<{
 		conversationId: string | null;
 		messages: WebRTCMessage[];
@@ -12,10 +15,11 @@ export default function useChatHistory(selectedFriendId: string | null) {
 	});
 
 	useEffect(() => {
-		if (!selectedFriendId) return;
+		if (!selectedFriendId || !currentUser?.uid) return;
 
 		let isMounted = true;
-		getHistoryFromDB(selectedFriendId)
+
+		getHistoryFromDB(currentUser.uid, selectedFriendId)
 			.then((data) => {
 				if (isMounted) {
 					setFetchedData({
@@ -29,7 +33,7 @@ export default function useChatHistory(selectedFriendId: string | null) {
 		return () => {
 			isMounted = false;
 		};
-	}, [selectedFriendId]);
+	}, [selectedFriendId, currentUser]);
 
 	const isDataMismatch = fetchedData.conversationId !== selectedFriendId;
 	const loading = selectedFriendId ? isDataMismatch : false;
