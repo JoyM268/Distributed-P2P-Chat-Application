@@ -73,22 +73,31 @@ export default function DiscoveredPeers({
 								}`}
 								onClick={() => selectUser(friend.uid)}
 							>
-								<Avatar
-									className={`w-10 h-10 border border-gray-400 font-semibold ${
-										!isSelected
-											? "text-gray-600"
-											: "text-blue-500"
-									}`}
-								>
-									<AvatarFallback className="bg-white">
-										{friend.name
-											? friend.name
-													.charAt(0)
-													.toUpperCase()
-											: "?"}
-									</AvatarFallback>
-								</Avatar>
-
+								<div className="relative">
+									<div
+										className={`p-1.5 absolute z-50 bottom-0 rounded-full right-0 ${
+											friend.status?.toLocaleLowerCase() ===
+											"online"
+												? "bg-green-400"
+												: "bg-red-500"
+										}`}
+									></div>
+									<Avatar
+										className={`w-10 h-10 border border-gray-400 font-semibold ${
+											!isSelected
+												? "text-gray-600"
+												: "text-blue-500"
+										}`}
+									>
+										<AvatarFallback className="bg-white">
+											{friend.name
+												? friend.name
+														.charAt(0)
+														.toUpperCase()
+												: "?"}
+										</AvatarFallback>
+									</Avatar>
+								</div>
 								<div className="flex flex-col">
 									<span className="font-semibold">
 										{friend.name || "Unknown User"}
