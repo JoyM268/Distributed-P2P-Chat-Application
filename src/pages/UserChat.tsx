@@ -63,7 +63,7 @@ export default function UserChat({
 						toggleLogoutWarning={toggleLogoutWarning}
 						selectedUser={selectedUser}
 						friends={friends}
-						loading={loading}
+						loadingFriends={loading}
 					/>
 				)}
 			</AnimatePresence>
