@@ -6,27 +6,29 @@ import { useAuth } from "@/context/AuthContext";
 import { db } from "@/services/firebase";
 import { ref, get, child } from "firebase/database";
 import DiscoveredPeers from "./DiscoveredPeers";
-import HandlePeers from "./RequestPeers";
 import type { FriendProfile } from "@/types";
+import useFriendRequests from "@/hooks/useFriendRequests";
+import RequestPeers from "./RequestPeers";
 
 function Sidebar({
 	isOpen,
 	selectUser,
 	toggleLogoutWarning,
 	selectedUser,
-	loading,
+	loadingFriends,
 	friends,
 }: {
 	isOpen: boolean;
 	selectUser: (uid: string) => void;
 	selectedUser: string | null;
 	toggleLogoutWarning: () => void;
-	loading: boolean;
+	loadingFriends: boolean;
 	friends: FriendProfile[];
 }) {
 	const [username, setUsername] = useState<string>("");
 	const { currentUser } = useAuth();
 	const [discover, setDiscover] = useState<boolean>(true);
+	const { requests, loading } = useFriendRequests(currentUser?.uid ?? null);
 
 	useEffect(() => {
 		if (currentUser) {
@@ -48,22 +50,31 @@ function Sidebar({
 		>
 			<div className="border-b border-gray-400 px-3 py-3 flex items-center justify-between">
 				<div className="flex gap-3 items-center">
-					<Avatar className="w-10 h-10 border border-gray-500 text-black">
+					<Avatar className="w-10 h-10 border border-gray-500 text-gray-600 font-semibold">
 						<AvatarFallback>
 							{username?.toLocaleUpperCase().charAt(0)}
 						</AvatarFallback>
 					</Avatar>
 
-					<span className="font-semibold">{username}</span>
+					<span className="font-semibold text-gray-700">
+						{username}
+					</span>
 				</div>
 
 				<div className="flex gap-2 items-center">
 					<div
-						className="rounded-full justify-center flex items-center hover:bg-gray-100 cursor-pointer p-2"
+						className="rounded-full justify-center flex items-center hover:bg-gray-100 cursor-pointer p-2 relative"
 						onClick={() => setDiscover((discover) => !discover)}
 					>
 						{discover ? (
-							<UserRoundPlus size={20} />
+							<>
+								{requests.length !== 0 && (
+									<div className="px-1 absolute bg-red-500 rounded-full z-30 bottom-1 right-1 text-[0.6rem] text-white font-semibold">
+										{requests.length}
+									</div>
+								)}
+								<UserRoundPlus size={20} />
+							</>
 						) : (
 							<UserRoundSearch size={20} />
 						)}
@@ -81,10 +92,10 @@ function Sidebar({
 					selectUser={selectUser}
 					selectedFriendId={selectedUser}
 					friends={friends}
-					loading={loading}
+					loading={loadingFriends}
 				/>
 			) : (
-				<HandlePeers />
+				<RequestPeers loading={loading} requests={requests} />
 			)}
 		</motion.div>
 	);

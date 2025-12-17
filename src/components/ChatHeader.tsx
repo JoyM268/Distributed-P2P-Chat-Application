@@ -29,16 +29,17 @@ function ChatHeader({
 				</div>
 				<div className="flex items-center gap-4">
 					<Avatar
-						className="w-10 h-10 border border-gray-400 text-black"
+						className="w-10 h-10 border border-gray-400 text-gray-600 font-semibold"
 						key={friend?.status}
 					>
-						<AvatarFallback className="text-black">
+						<AvatarFallback>
 							{friend?.username &&
 								friend.username.toLocaleUpperCase().charAt(0)}
 						</AvatarFallback>
 					</Avatar>
+
 					<div className="flex flex-col gap-0.5">
-						<span className="font-semibold">
+						<span className="font-semibold text-gray-700">
 							{friend?.username}
 						</span>
 						<span

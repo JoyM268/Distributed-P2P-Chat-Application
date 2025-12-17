@@ -1,17 +1,24 @@
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import useFriendRequests from "@/hooks/useFriendRequests";
+
 import { useAuth } from "@/context/AuthContext";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Check, X } from "lucide-react";
 import { db } from "@/services/firebase";
 import { ref, update, get, child } from "firebase/database";
+import type { FriendProfile } from "@/types";
 
-export default function RequestPeers() {
+export default function RequestPeers({
+	requests,
+	loading,
+}: {
+	requests: FriendProfile[];
+	loading: boolean;
+}) {
 	const [search, setSearch] = useState<string>("");
 	const { currentUser } = useAuth();
-	const { requests, loading } = useFriendRequests(currentUser?.uid ?? null);
+
 	const [sending, setSending] = useState(false);
 
 	async function handleSendRequest(event: React.FormEvent<HTMLFormElement>) {

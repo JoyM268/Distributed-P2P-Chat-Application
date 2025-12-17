@@ -41,7 +41,9 @@ export default function DiscoveredPeers({
 			</div>
 
 			<div className="px-4 pt-4 pb-2">
-				<span className="text-sm font-medium">My Friends</span>
+				<span className="text-sm font-medium text-gray-800">
+					My Friends
+				</span>
 			</div>
 
 			<div className="px-4 pb-4 flex-1 overflow-y-auto">
@@ -71,7 +73,13 @@ export default function DiscoveredPeers({
 								}`}
 								onClick={() => selectUser(friend.uid)}
 							>
-								<Avatar className="w-10 h-10 border border-gray-400 text-black">
+								<Avatar
+									className={`w-10 h-10 border border-gray-400 font-semibold ${
+										!isSelected
+											? "text-gray-600"
+											: "text-blue-500"
+									}`}
+								>
 									<AvatarFallback className="bg-white">
 										{friend.name
 											? friend.name
