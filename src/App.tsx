@@ -13,19 +13,15 @@ import usePresence from "./hooks/usePresence";
 import { ref, set, serverTimestamp } from "firebase/database";
 import { db } from "@/services/firebase";
 import { Spinner } from "./components/ui/spinner";
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import PublicRoutes from "./components/PublicRoutes";
 
 function App() {
-	const [option, setOption] = useState<"main" | "login" | "signup">("main");
 	const [logoutWarning, setLogoutWarning] = useState<boolean>(false);
 	const [addPeers, setAddPeers] = useState<boolean>(false);
-	const { currentUser, authLoading } = useAuth();
+	const { authLoading } = useAuth();
 	usePresence();
-
-	function changeOption(newOption: "main" | "login" | "signup") {
-		if (option !== newOption) {
-			setOption(newOption);
-		}
-	}
 
 	async function logout() {
 		try {
@@ -62,20 +58,48 @@ function App() {
 
 	return (
 		<>
-			{currentUser && (
-				<UserChat
-					toggleLogoutWarning={toggleLogoutWarning}
-					toggleAddPeers={toggleAddPeers}
-				/>
-			)}
-			{!currentUser && (
-				<div>
-					<MainHeader option={option} changeOption={changeOption} />
-					{option === "main" && <HeroSection />}
-					{option === "login" && <Login />}
-					{option === "signup" && <Signup />}
-				</div>
-			)}
+			<Routes>
+				<Route element={<ProtectedRoutes />}>
+					<Route
+						path="/chat/:username?"
+						element={
+							<UserChat
+								toggleLogoutWarning={toggleLogoutWarning}
+								toggleAddPeers={toggleAddPeers}
+							/>
+						}
+					/>
+				</Route>
+				<Route element={<PublicRoutes />}>
+					<Route
+						path="/"
+						element={
+							<>
+								<MainHeader />
+								<HeroSection />
+							</>
+						}
+					/>
+					<Route
+						path="/login"
+						element={
+							<>
+								<MainHeader />
+								<Login />
+							</>
+						}
+					/>
+					<Route
+						path="/signup"
+						element={
+							<>
+								<MainHeader />
+								<Signup />
+							</>
+						}
+					/>
+				</Route>
+			</Routes>
 			<LogoutWarning
 				logoutWarning={logoutWarning}
 				setLogoutWarning={setLogoutWarning}

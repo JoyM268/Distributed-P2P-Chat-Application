@@ -5,6 +5,7 @@ import { useState } from "react";
 import { auth, db, createUserWithEmailAndPassword } from "@/services/firebase";
 import { FirebaseError } from "firebase/app";
 import { ref, set, get } from "firebase/database";
+import { NavLink } from "react-router-dom";
 
 export default function Signup() {
 	const [username, setUsername] = useState<string>("");
@@ -120,7 +121,9 @@ export default function Signup() {
 			</form>
 			<div className="text-gray-600 text-xs -mt-3">
 				Already have an account?{" "}
-				<span className="text-blue-500 cursor-pointer">Login</span>
+				<NavLink to="/login" className="text-blue-500 cursor-pointer">
+					Login
+				</NavLink>
 			</div>
 		</div>
 	);

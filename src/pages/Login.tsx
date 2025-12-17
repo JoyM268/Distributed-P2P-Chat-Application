@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { signInWithEmailAndPassword, auth } from "@/services/firebase";
 import { FirebaseError } from "firebase/app";
+import { NavLink } from "react-router-dom";
 
 export default function Login() {
 	const [email, setEmail] = useState<string>("");
@@ -71,7 +72,9 @@ export default function Login() {
 			</form>
 			<div className="text-gray-600 text-xs -mt-3">
 				Don't have an account?{" "}
-				<span className="text-blue-500 cursor-pointer">Signup</span>
+				<NavLink to="/signup" className="text-blue-500 cursor-pointer">
+					Signup
+				</NavLink>
 			</div>
 		</div>
 	);

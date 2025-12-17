@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export default function HeroSection() {
 	return (
@@ -13,13 +14,19 @@ export default function HeroSection() {
 				touches our servers.
 			</p>
 			<div className="flex gap-5">
-				<button className="text-white font-semibold bg-blue-500 px-3 py-2 rounded-lg cursor-pointer">
+				<NavLink
+					to="/signup"
+					className="text-white font-semibold bg-blue-500 px-3 py-2 rounded-lg cursor-pointer"
+				>
 					Get Started
-				</button>
-				<button className="flex items-center gap-1.5 font-semibold cursor-pointer">
+				</NavLink>
+				<a
+					href="https://github.com/JoyM268/Distributed-P2P-Chat-Application"
+					className="flex items-center gap-1.5 font-semibold cursor-pointer"
+				>
 					<span>Learn More</span>
 					<ArrowRight size={12} strokeWidth={3} />
-				</button>
+				</a>
 			</div>
 		</div>
 	);

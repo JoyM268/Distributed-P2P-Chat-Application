@@ -2,10 +2,11 @@ import { AnimatePresence } from "motion/react";
 import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import SelectPeerMessage from "@/components/SelectPeerMessage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useWebRTC from "@/hooks/useWebRTC";
 import useFriends from "@/hooks/useFriends";
 import { useAuth } from "@/hooks/useAuth";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function UserChat({
 	toggleLogoutWarning,
@@ -14,12 +15,23 @@ export default function UserChat({
 	toggleLogoutWarning: () => void;
 	toggleAddPeers: () => void;
 }) {
-	const [sidebar, setSidebar] = useState<boolean>(true);
-	const [selectedUser, setSelectedUser] = useState<string | null>(null);
+	const { username } = useParams<{ username?: string }>();
+	const navigate = useNavigate();
+
 	const { currentUser } = useAuth();
 	const { friends, loading } = useFriends({
 		currentUserId: currentUser?.uid || null,
 	});
+	const user = friends.find((f) => f.username === username);
+	const selectedUser = user?.uid ?? null;
+
+	useEffect(() => {
+		if (username && !loading && !user) {
+			navigate("/chat", { replace: true });
+		}
+	}, [username, loading, user, navigate]);
+
+	const [sidebar, setSidebar] = useState(true);
 
 	const { sendMessage, messages } = useWebRTC(
 		currentUser?.uid || null,
@@ -27,29 +39,26 @@ export default function UserChat({
 	);
 
 	function toggleSidebar() {
-		setSidebar((sidebar) => !sidebar);
+		setSidebar((s) => !s);
 	}
 
 	function selectUser(uid: string) {
-		if (selectedUser && selectedUser === uid) {
-			setSelectedUser(null);
+		if (uid === selectedUser) {
+			navigate("/chat", { replace: true });
 			return;
 		}
-		setSelectedUser(uid);
+
+		const friend = friends.find((f) => f.uid === uid);
+		if (friend) {
+			navigate(`/chat/${friend.username}`);
+		} else {
+			navigate("/chat", { replace: true });
+		}
 	}
 
 	function handleSend(content: string) {
-		console.log("handleSend called with:", { selectedUser, content });
 		if (selectedUser && content.trim()) {
-			console.log("Calling sendMessage with selectedUser:", selectedUser);
 			sendMessage(selectedUser, content.trim());
-		} else {
-			console.log(
-				"Not sending - selectedUser:",
-				selectedUser,
-				"content:",
-				content
-			);
 		}
 	}
 
@@ -67,6 +76,7 @@ export default function UserChat({
 					/>
 				)}
 			</AnimatePresence>
+
 			{selectedUser ? (
 				<Chat
 					toggleSidebar={toggleSidebar}
