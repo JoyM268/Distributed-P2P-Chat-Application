@@ -13,7 +13,8 @@ export default function Signup() {
 	const [confirmPassword, setConfirmPassword] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 
-	async function handleSubmit() {
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
 		if (password !== confirmPassword) {
 			console.log("Passwords do not match");
 			return;
@@ -68,7 +69,10 @@ export default function Signup() {
 					Join our community and start chatting today.
 				</p>
 			</div>
-			<div className="max-w-7xl min-w-sm flex flex-col gap-5">
+			<form
+				className="max-w-7xl min-w-sm flex flex-col gap-5"
+				onSubmit={handleSubmit}
+			>
 				<div className="flex flex-col gap-1">
 					<Label htmlFor="username">Username</Label>
 					<Input
@@ -109,12 +113,11 @@ export default function Signup() {
 				</div>
 				<Button
 					className="bg-blue-500 mt-1 cursor-pointer hover:bg-blue-500/85"
-					onClick={handleSubmit}
 					disabled={loading}
 				>
 					{loading ? "Loading..." : "Create Account"}
 				</Button>
-			</div>
+			</form>
 			<div className="text-gray-600 text-xs -mt-3">
 				Already have an account?{" "}
 				<span className="text-blue-500 cursor-pointer">Login</span>

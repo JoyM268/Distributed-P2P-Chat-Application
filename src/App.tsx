@@ -11,7 +11,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import usePresence from "./hooks/usePresence";
 import { ref, set, serverTimestamp } from "firebase/database";
-import { db } from "@/services/firebase"; // Adjust path as needed
+import { db } from "@/services/firebase";
 
 function App() {
 	const [option, setOption] = useState<"main" | "login" | "signup">("main");

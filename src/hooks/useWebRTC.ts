@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { db } from "@/services/firebase";
 import { ref, onChildAdded, push, remove, off } from "firebase/database";
+import { saveMessageToDB } from "@/services/chatHistory";
 import type { WebRTCMessage } from "@/types";
 
 interface Friend {
@@ -34,6 +35,7 @@ export default function useWebRTC(
 ) {
 	const peersRef = useRef<{ [key: string]: RTCPeerConnection }>({});
 	const channelsRef = useRef<{ [key: string]: RTCDataChannel }>({});
+
 	const [messages, setMessages] = useState<WebRTCMessage[]>([]);
 
 	const sendSignal = useCallback(
@@ -56,19 +58,21 @@ export default function useWebRTC(
 			channel.onopen = () =>
 				console.log(`P2P Channel Open with ${peerId}`);
 
-			channel.onmessage = (event) => {
+			channel.onmessage = async (event) => {
 				try {
-					const msg = JSON.parse(event.data);
-					setMessages((prev) => [
-						...prev,
-						{
-							senderId: peerId,
-							content: msg.content,
-							timestamp: Date.now(),
-						},
-					]);
+					const parsed = JSON.parse(event.data);
+
+					const msg: WebRTCMessage = {
+						senderId: peerId,
+						content: parsed.content,
+						timestamp: parsed.timestamp || Date.now(),
+					};
+
+					setMessages((prev) => [...prev, msg]);
+					await saveMessageToDB(peerId, msg);
+					console.log(`Received & Saved message from ${peerId}`);
 				} catch (e) {
-					console.error("Failed to parse message", e);
+					console.error("Failed to parse or save message", e);
 				}
 			};
 		},
@@ -194,35 +198,40 @@ export default function useWebRTC(
 
 		onChildAdded(signalingRef, async (snapshot) => {
 			const data = snapshot.val();
-
 			if (!data || !data.senderId) return;
 
 			await handleSignal(data.senderId, data);
-
 			remove(snapshot.ref);
 		});
 
 		return () => off(signalingRef);
 	}, [currentUserId, handleSignal]);
 
-	const sendMessage = useCallback((peerId: string, content: string) => {
+	const sendMessage = useCallback(async (peerId: string, content: string) => {
 		const channel = channelsRef.current[peerId];
 
 		if (channel && channel.readyState === "open") {
-			const msg = { content, timestamp: Date.now() };
-			channel.send(JSON.stringify(msg));
+			const timestamp = Date.now();
+			const msgPayload = { content, timestamp };
 
-			setMessages((prev) => [
-				...prev,
-				{
-					senderId: "me",
-					receiverId: peerId,
-					content,
-					timestamp: Date.now(),
-				},
-			]);
+			channel.send(JSON.stringify(msgPayload));
+
+			const myMsg: WebRTCMessage = {
+				senderId: "me",
+				receiverId: peerId,
+				content,
+				timestamp,
+			};
+
+			setMessages((prev) => [...prev, myMsg]);
+
+			await saveMessageToDB(peerId, myMsg);
+			console.log(`Sent & Saved message to ${peerId}`);
+
+			return true;
 		} else {
 			console.warn(`Cannot send to ${peerId}: Channel not open`);
+			return false;
 		}
 	}, []);
 

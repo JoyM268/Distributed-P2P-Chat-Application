@@ -10,7 +10,8 @@ export default function Login() {
 	const [password, setPassword] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 
-	async function handleSubmit() {
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
 		setLoading(true);
 		try {
 			const userCredential = await signInWithEmailAndPassword(
@@ -38,7 +39,10 @@ export default function Login() {
 					Sign in to continue to your conversations.
 				</p>
 			</div>
-			<div className="max-w-7xl min-w-sm flex flex-col gap-5">
+			<form
+				className="max-w-7xl min-w-sm flex flex-col gap-5"
+				onSubmit={handleSubmit}
+			>
 				<div className="flex flex-col gap-1">
 					<Label htmlFor="email">Email</Label>
 					<Input
@@ -60,12 +64,11 @@ export default function Login() {
 				</div>
 				<Button
 					className="bg-blue-500 mt-1 cursor-pointer hover:bg-blue-500/85"
-					onClick={handleSubmit}
 					disabled={loading}
 				>
 					{loading ? "Loading..." : "Login"}
 				</Button>
-			</div>
+			</form>
 			<div className="text-gray-600 text-xs -mt-3">
 				Don't have an account?{" "}
 				<span className="text-blue-500 cursor-pointer">Signup</span>

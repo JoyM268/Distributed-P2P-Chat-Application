@@ -14,7 +14,8 @@ export default function RequestPeers() {
 	const { requests, loading } = useFriendRequests(currentUser?.uid ?? null);
 	const [sending, setSending] = useState(false);
 
-	const handleSendRequest = async () => {
+	async function handleSendRequest(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault();
 		const usernameInput = search.trim();
 		if (!usernameInput || !currentUser) return;
 
@@ -76,7 +77,7 @@ export default function RequestPeers() {
 		} finally {
 			setSending(false);
 		}
-	};
+	}
 
 	const handleAccept = async (senderUid: string) => {
 		if (!currentUser) return;
@@ -105,7 +106,10 @@ export default function RequestPeers() {
 
 	return (
 		<>
-			<div className="px-4 py-4 border-b border-gray-200 flex flex-col justify-center gap-2">
+			<form
+				className="px-4 py-4 border-b border-gray-200 flex flex-col justify-center gap-2"
+				onSubmit={handleSendRequest}
+			>
 				<div className="relative border border-gray-400 rounded-md">
 					<Input
 						placeholder="Username"
@@ -116,11 +120,10 @@ export default function RequestPeers() {
 				<Button
 					className="w-full bg-blue-500 mt-1 cursor-pointer hover:bg-blue-500/85"
 					disabled={sending}
-					onClick={handleSendRequest}
 				>
 					{sending ? "Sending..." : "Send Request"}
 				</Button>
-			</div>
+			</form>
 
 			<div className="px-4 pt-4 pb-2">
 				<span className="text-sm font-medium">Requests</span>
