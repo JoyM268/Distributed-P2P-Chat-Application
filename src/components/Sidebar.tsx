@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { LogOut, UserRoundPlus, UserRoundSearch } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/services/firebase";
 import { ref, get, child } from "firebase/database";
 import DiscoveredPeers from "./DiscoveredPeers";

@@ -2,12 +2,13 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Check, X } from "lucide-react";
 import { db } from "@/services/firebase";
 import { ref, update, get, child } from "firebase/database";
 import type { FriendProfile } from "@/types";
+import { Spinner } from "./ui/spinner";
 
 export default function RequestPeers({
 	requests,
@@ -137,8 +138,11 @@ export default function RequestPeers({
 			</div>
 			<div className="px-4 pb-4 flex-1 overflow-y-auto">
 				{loading && (
-					<div className="text-sm text-gray-500 text-center py-4">
-						Loading...
+					<div className="flex justify-center pt-24 gap-2">
+						<Spinner />
+						<div className="text-sm text-gray-500 py-4">
+							Loading...
+						</div>
 					</div>
 				)}
 

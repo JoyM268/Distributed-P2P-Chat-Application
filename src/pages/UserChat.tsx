@@ -5,7 +5,7 @@ import SelectPeerMessage from "@/components/SelectPeerMessage";
 import { useState } from "react";
 import useWebRTC from "@/hooks/useWebRTC";
 import useFriends from "@/hooks/useFriends";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function UserChat({
 	toggleLogoutWarning,

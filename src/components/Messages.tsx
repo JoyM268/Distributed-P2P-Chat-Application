@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import type { WebRTCMessage } from "@/types";
 import useChatHistory from "@/hooks/useChatHistory";
+import { Spinner } from "./ui/spinner";
 
 function Messages({
 	userMessage,
@@ -53,8 +54,11 @@ function Messages({
 			}`}
 		>
 			{loading && (
-				<div className="text-center text-xs font-semibold text-gray-400 py-2">
-					Loading history...
+				<div className="justify-center flex items-center gap-2">
+					<Spinner />
+					<div className="text-xs font-semibold text-gray-400 py-2">
+						Loading...
+					</div>
 				</div>
 			)}
 

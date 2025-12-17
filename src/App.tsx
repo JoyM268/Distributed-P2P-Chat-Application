@@ -6,12 +6,13 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import LogoutWarning from "./components/LogoutWarning";
 import AddPeers from "./components/AddPeers";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import { signOut } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import usePresence from "./hooks/usePresence";
 import { ref, set, serverTimestamp } from "firebase/database";
 import { db } from "@/services/firebase";
+import { Spinner } from "./components/ui/spinner";
 
 function App() {
 	const [option, setOption] = useState<"main" | "login" | "signup">("main");
@@ -52,8 +53,9 @@ function App() {
 
 	if (authLoading) {
 		return (
-			<div className="pt-40 text-center text-xl text-gray-700">
-				Loading Application...
+			<div className="flex h-full text-gray-700 gap-2 justify-center w-full items-center">
+				<Spinner />
+				<div>Loading...</div>
 			</div>
 		);
 	}

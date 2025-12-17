@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getHistoryFromDB } from "@/services/chatHistory";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import type { WebRTCMessage } from "@/types";
 
 export default function useChatHistory(selectedFriendId: string | null) {
