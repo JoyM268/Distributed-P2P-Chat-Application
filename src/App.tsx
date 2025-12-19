@@ -16,11 +16,14 @@ import { Spinner } from "./components/ui/spinner";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import PublicRoutes from "./components/PublicRoutes";
+import Menu from "./components/Menu";
+import { AnimatePresence } from "motion/react";
 
 function App() {
 	const [logoutWarning, setLogoutWarning] = useState<boolean>(false);
 	const [addPeers, setAddPeers] = useState<boolean>(false);
 	const { authLoading } = useAuth();
+	const [menu, setMenu] = useState(false);
 	usePresence();
 
 	async function logout() {
@@ -75,8 +78,11 @@ function App() {
 						path="/"
 						element={
 							<>
-								<MainHeader />
-								<HeroSection />
+								<MainHeader menu={menu} setMenu={setMenu} />
+								<AnimatePresence>
+									{menu && <Menu />}
+								</AnimatePresence>
+								<HeroSection setMenu={setMenu} />
 							</>
 						}
 					/>
@@ -84,8 +90,11 @@ function App() {
 						path="/login"
 						element={
 							<>
-								<MainHeader />
-								<Login />
+								<MainHeader menu={menu} setMenu={setMenu} />
+								<AnimatePresence>
+									{menu && <Menu />}
+								</AnimatePresence>
+								<Login setMenu={setMenu} />
 							</>
 						}
 					/>
@@ -93,8 +102,11 @@ function App() {
 						path="/signup"
 						element={
 							<>
-								<MainHeader />
-								<Signup />
+								<MainHeader menu={menu} setMenu={setMenu} />
+								<AnimatePresence>
+									{menu && <Menu />}
+								</AnimatePresence>
+								<Signup setMenu={setMenu} />
 							</>
 						}
 					/>

@@ -147,7 +147,7 @@ export default function RequestPeers({
 				)}
 
 				{!loading && requests.length === 0 && (
-					<div className="text-sm text-gray-500 text-center py-4">
+					<div className="text-sm text-gray-500 text-center mt-20 sm:mt-5">
 						No friend requests.
 					</div>
 				)}
@@ -159,7 +159,7 @@ export default function RequestPeers({
 					>
 						<div className="flex items-center justify-between w-full">
 							<div className="flex gap-3 items-center">
-								<Avatar className="w-10 h-10 border border-gray-400 text-black">
+								<Avatar className="w-10 h-10 border border-gray-400 text-black select-none">
 									<AvatarFallback className="bg-white">
 										{request.name
 											? request.name

@@ -46,11 +46,13 @@ function Sidebar({
 			initial={false}
 			animate={{ x: isOpen ? 0 : "-100%" }}
 			transition={{ type: "spring", stiffness: 300, damping: 30 }}
-			className="border-r border-gray-400 min-w-xs h-screen sticky left-0 flex flex-col overflow-hidden"
+			className={`border-r border-gray-400  h-screen sticky left-0 flex-col overflow-hidden sm:min-w-xs ${
+				selectedUser ? "hidden sm:flex" : "flex min-w-full"
+			}`}
 		>
 			<div className="border-b border-gray-400 px-3 py-3 flex items-center justify-between">
 				<div className="flex gap-3 items-center">
-					<Avatar className="w-10 h-10 border border-gray-500 text-gray-600 font-semibold">
+					<Avatar className="w-10 h-10 border border-gray-500 text-gray-600 font-semibold select-none">
 						<AvatarFallback>
 							{username?.toLocaleUpperCase().charAt(0)}
 						</AvatarFallback>

@@ -85,6 +85,7 @@ export default function UserChat({
 					sendMessage={handleSend}
 					selectedUser={selectedUser}
 					friends={friends}
+					selectUser={selectUser}
 				/>
 			) : (
 				<SelectPeerMessage

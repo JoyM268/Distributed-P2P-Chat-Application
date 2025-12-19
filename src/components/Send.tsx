@@ -21,7 +21,13 @@ function Send({
 	}, [friends, selectedUser]);
 
 	return (
-		<div className="sticky bottom-0 border-t border-gray-400 px-20 py-4 bg-white overflow-hidden shrink-0">
+		<div
+			className={`bottom-0 border-t border-gray-400 px-5 sm:px-20 py-4 overflow-hidden shrink-0 ${
+				friend?.status?.toLocaleLowerCase() !== "online"
+					? "bg-gray-50"
+					: "bg-white"
+			}`}
+		>
 			{friend?.status?.toLocaleLowerCase() === "online" ? (
 				<InputGroup>
 					<form
@@ -57,7 +63,7 @@ function Send({
 					</form>
 				</InputGroup>
 			) : (
-				<div className="w-full text-center font-semibold text-gray-900">
+				<div className="w-full text-center font-semibold text-red-600">
 					User is offline
 				</div>
 			)}

@@ -85,7 +85,7 @@ export default function DiscoveredPeers({
 										}`}
 									></div>
 									<Avatar
-										className={`w-10 h-10 border border-gray-400 font-semibold ${
+										className={`w-10 h-10 border border-gray-400 font-semibold select-none ${
 											!isSelected
 												? "text-gray-600"
 												: "text-blue-500"

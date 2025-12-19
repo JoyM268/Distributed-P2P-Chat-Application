@@ -38,6 +38,7 @@ function Messages({
 	}, [history, userMessage, selectedUser]);
 
 	useEffect(() => {
+		if (displayMessages.length === 0) return;
 		const t = setTimeout(() => {
 			endRef.current?.scrollIntoView({
 				behavior: "smooth",
@@ -49,7 +50,7 @@ function Messages({
 
 	return (
 		<div
-			className={`flex-1 scroll-auto px-4 md:px-10 py-4 flex flex-col gap-2 overflow-auto relative ${
+			className={`h-full scroll-auto px-4 md:px-10 py-4 flex flex-col gap-2 overflow-auto relative bg-gray-50 ${
 				loading ? "justify-center items-center" : ""
 			}`}
 		>
@@ -71,9 +72,9 @@ function Messages({
 						  ).toDateString()
 						: null;
 				const todayDate = new Date();
-				const yesterday = new Date(
-					todayDate.getDate() - 1
-				).toDateString();
+				const yesterdayDate = new Date(todayDate);
+				yesterdayDate.setDate(todayDate.getDate() - 1);
+				const yesterday = yesterdayDate.toDateString();
 				const today = todayDate.toDateString();
 				const currDate = new Date(m.timestamp);
 				const curr = currDate.toDateString();
@@ -104,7 +105,7 @@ function Messages({
 							</div>
 						)}
 						<div
-							key={index}
+							key={`${m.senderId}-${m.timestamp}`}
 							className={`w-full flex text-wrap ${
 								isMe ? "justify-end" : "justify-start"
 							}`}

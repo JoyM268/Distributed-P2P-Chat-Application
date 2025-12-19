@@ -10,6 +10,7 @@ function Chat({
 	sendMessage,
 	selectedUser,
 	friends,
+	selectUser,
 }: {
 	toggleSidebar: () => void;
 	userMessage: WebRTCMessage[];
@@ -17,14 +18,20 @@ function Chat({
 	sendMessage: (content: string) => void;
 	selectedUser: string | null;
 	friends: FriendProfile[];
+	selectUser: (uid: string) => void;
 }) {
 	return (
-		<div className="flex-1 h-screen relative flex flex-col overflow-hidden">
+		<div
+			className={`flex-1 h-dvh relative flex-col overflow-hidden ${
+				selectedUser === null ? "hidden :flex" : "flex"
+			}`}
+		>
 			<ChatHeader
 				toggleSidebar={toggleSidebar}
 				sidebar={sidebar}
 				selectedUser={selectedUser}
 				friends={friends}
+				selectUser={selectUser}
 			/>
 			<Messages userMessage={userMessage} selectedUser={selectedUser} />
 			<Send
