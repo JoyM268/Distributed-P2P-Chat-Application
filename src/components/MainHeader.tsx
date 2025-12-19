@@ -1,4 +1,4 @@
-import { Menu, MessageSquare, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { type Dispatch, type SetStateAction } from "react";
@@ -17,8 +17,8 @@ export default function MainHeader({
 				to="/"
 				className="flex gap-2 font-stretch-90% items-center cursor-pointer"
 			>
-				<img src="logo.png" alt="p2p-chat" className="w-11 h-11" />
-				<span className="font-bold sm:text-xl text-lg text-blue-500/85">
+				<img src="logo.png" alt="p2p-chat" className="w-9 h-9" />
+				<span className="font-bold sm:text-xl text-lg text-blue-500">
 					P2P Chat
 				</span>
 			</NavLink>
