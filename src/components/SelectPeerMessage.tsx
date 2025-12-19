@@ -34,8 +34,8 @@ function SelectPeerMessage({
 							It's quite here...
 						</h1>
 						<p className="text-wrap text-gray-600 px-2 text-center">
-							Pick a peer to chat with, or add a new one to start
-							a conversation.
+							Pick a friend to chat with, or add a new one to
+							start a conversation.
 						</p>
 					</div>
 					<button
@@ -43,7 +43,7 @@ function SelectPeerMessage({
 						onClick={() => toggleAddPeers()}
 					>
 						<UserRoundPlus />
-						Add Peers
+						Add Friends
 					</button>
 				</div>
 			</div>

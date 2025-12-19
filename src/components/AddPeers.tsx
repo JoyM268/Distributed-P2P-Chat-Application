@@ -95,7 +95,7 @@ export default function AddPeers({
 			<DialogContent className="text-center">
 				<DialogHeader>
 					<DialogTitle className="font-semibold">
-						Add Peers
+						Add Friends
 					</DialogTitle>
 				</DialogHeader>
 				<div className="mt-1 flex flex-col gap-2 mb-2">
