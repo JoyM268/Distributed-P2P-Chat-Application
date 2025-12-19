@@ -13,9 +13,12 @@ export default function MainHeader({
 }) {
 	return (
 		<div className="flex justify-between items-center px-4 py-3 text-blue-600 border-b border border-gray-300 fixed w-full z-50 bg-white select-none">
-			<NavLink to="/" className="flex gap-2 items-center cursor-pointer">
-				<MessageSquare />
-				<span className="font-semibold sm:text-xl text-lg">
+			<NavLink
+				to="/"
+				className="flex gap-2 font-stretch-90% items-center cursor-pointer"
+			>
+				<img src="logo.png" alt="p2p-chat" className="w-11 h-11" />
+				<span className="font-bold sm:text-xl text-lg text-blue-500/85">
 					P2P Chat
 				</span>
 			</NavLink>
