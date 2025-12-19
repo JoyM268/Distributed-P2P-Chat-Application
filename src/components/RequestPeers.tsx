@@ -1,7 +1,6 @@
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
-
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Check, X } from "lucide-react";
