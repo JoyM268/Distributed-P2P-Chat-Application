@@ -17,6 +17,7 @@ function Sidebar({
 	selectedUser,
 	loadingFriends,
 	friends,
+	toggleAddPeers,
 }: {
 	isOpen: boolean;
 	selectUser: (uid: string) => void;
@@ -24,6 +25,7 @@ function Sidebar({
 	toggleLogoutWarning: () => void;
 	loadingFriends: boolean;
 	friends: FriendProfile[];
+	toggleAddPeers: () => void;
 }) {
 	const [username, setUsername] = useState<string>("");
 	const { currentUser } = useAuth();
@@ -95,6 +97,7 @@ function Sidebar({
 					selectedFriendId={selectedUser}
 					friends={friends}
 					loading={loadingFriends}
+					toggleAddPeers={toggleAddPeers}
 				/>
 			) : (
 				<RequestPeers loading={loading} requests={requests} />

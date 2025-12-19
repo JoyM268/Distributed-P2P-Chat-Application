@@ -1,20 +1,23 @@
 import { Input } from "./ui/input";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import type { FriendProfile } from "@/types";
 import { Spinner } from "./ui/spinner";
+import { Button } from "./ui/button";
 
 export default function DiscoveredPeers({
 	selectUser,
 	selectedFriendId,
 	friends,
 	loading,
+	toggleAddPeers,
 }: {
 	selectUser: (uid: string) => void;
 	selectedFriendId?: string | null;
 	friends: FriendProfile[];
 	loading: boolean;
+	toggleAddPeers: () => void;
 }) {
 	const [search, setSearch] = useState<string>("");
 
@@ -56,8 +59,16 @@ export default function DiscoveredPeers({
 				)}
 
 				{!loading && friends.length === 0 && (
-					<div className="text-sm text-gray-500 text-center py-4">
-						No friends found.
+					<div className="pt-24 flex flex-col items-center justify-center gap-3">
+						<div className="text-sm text-gray-800 text-center">
+							No friends found.
+						</div>
+						<Button
+							className="bg-blue-500 hover:bg-blue-500/85 cursor-pointer sm:hidden"
+							onClick={toggleAddPeers}
+						>
+							<UserPlus /> Add Friend
+						</Button>
 					</div>
 				)}
 

@@ -92,7 +92,7 @@ export default function AddPeers({
 
 	return (
 		<Dialog open={addPeers} onOpenChange={setAddPeers}>
-			<DialogContent>
+			<DialogContent className="text-center">
 				<DialogHeader>
 					<DialogTitle className="font-semibold">
 						Add Peers
@@ -112,14 +112,14 @@ export default function AddPeers({
 					<DialogClose>
 						<Button
 							variant="outline"
-							className="cursor-pointer select-none"
+							className="cursor-pointer select-none w-full"
 						>
 							Cancel
 						</Button>
 					</DialogClose>
 					<form onSubmit={handleSendRequest}>
 						<Button
-							className="bg-blue-500 text-white hover:bg-blue-500/85 cursor-pointer select-none"
+							className="bg-blue-500 text-white hover:bg-blue-500/85 cursor-pointer select-none w-full"
 							type="submit"
 							disabled={sending}
 						>

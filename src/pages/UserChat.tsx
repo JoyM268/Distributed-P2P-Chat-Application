@@ -72,6 +72,7 @@ export default function UserChat({
 						toggleLogoutWarning={toggleLogoutWarning}
 						selectedUser={selectedUser}
 						friends={friends}
+						toggleAddPeers={toggleAddPeers}
 						loadingFriends={loading}
 					/>
 				)}
