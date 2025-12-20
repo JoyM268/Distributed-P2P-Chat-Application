@@ -19,6 +19,7 @@ import PublicRoutes from "./components/PublicRoutes";
 import Menu from "./components/Menu";
 import { AnimatePresence } from "motion/react";
 import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner";
 
 function App() {
 	const [logoutWarning, setLogoutWarning] = useState<boolean>(false);
@@ -38,8 +39,10 @@ function App() {
 				});
 			}
 			await signOut(auth);
+			toast.success("Logout successful. See you next time!");
 		} catch (error) {
 			console.error("Error logging out:", error);
+			toast.error("Error logging out.");
 		}
 	}
 

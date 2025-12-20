@@ -5,6 +5,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { signInWithEmailAndPassword, auth } from "@/services/firebase";
 import { FirebaseError } from "firebase/app";
 import { NavLink } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Login({
 	setMenu,
@@ -23,18 +24,15 @@ export default function Login({
 		event.preventDefault();
 		setLoading(true);
 		try {
-			const userCredential = await signInWithEmailAndPassword(
-				auth,
-				email,
-				password
-			);
-			console.log("Successfully Logged In", userCredential.user.uid);
+			await signInWithEmailAndPassword(auth, email, password);
+			toast.success("Successfully logged in.");
 		} catch (err) {
 			if (err instanceof FirebaseError) {
 				console.log(err.message);
 			} else {
 				console.log("Error Occured");
 			}
+			toast.error("An error occured, please try again later.");
 		} finally {
 			setLoading(false);
 		}

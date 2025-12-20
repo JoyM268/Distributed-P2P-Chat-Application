@@ -6,6 +6,7 @@ import { auth, db, createUserWithEmailAndPassword } from "@/services/firebase";
 import { FirebaseError } from "firebase/app";
 import { ref, set, get } from "firebase/database";
 import { NavLink } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Signup({
 	setMenu,
@@ -39,7 +40,7 @@ export default function Signup({
 			const snapshot = await get(usernameRef);
 
 			if (snapshot.exists()) {
-				console.log("Username already taken");
+				toast.error("Username already taken");
 				return;
 			}
 
@@ -59,13 +60,14 @@ export default function Signup({
 
 			await set(usernameRef, user.uid);
 
-			console.log("Successfully Signed Up");
+			toast.success("Account created successfully.");
 		} catch (err) {
 			if (err instanceof FirebaseError) {
 				console.log(err.message);
 			} else {
 				console.log(err);
 			}
+			toast.error("An error occured, please try again later.");
 		} finally {
 			setLoading(false);
 		}
