@@ -15,7 +15,7 @@ function SelectPeerMessage({
 	toggleAddPeers(): void;
 }) {
 	return (
-		<div className="w-full hidden sm:block bg-gray-100">
+		<div className="w-full hidden sm:block bg-gray-100 h-screen">
 			<div className="flex justify-between py-3 border-b border-gray-400 px-3 sticky top-0 bg-white shrink-0">
 				<div
 					className="h-8 w-8 hover:border border-gray-400 cursor-pointer flex justify-center items-center rounded-lg"

@@ -1,4 +1,3 @@
-import { AnimatePresence } from "motion/react";
 import Sidebar from "@/components/Sidebar";
 import Chat from "@/components/Chat";
 import SelectPeerMessage from "@/components/SelectPeerMessage";
@@ -63,20 +62,16 @@ export default function UserChat({
 	}
 
 	return (
-		<div className="flex relative">
-			<AnimatePresence initial={false}>
-				{sidebar && (
-					<Sidebar
-						isOpen={sidebar}
-						selectUser={selectUser}
-						toggleLogoutWarning={toggleLogoutWarning}
-						selectedUser={selectedUser}
-						friends={friends}
-						toggleAddPeers={toggleAddPeers}
-						loadingFriends={loading}
-					/>
-				)}
-			</AnimatePresence>
+		<div className="flex relative w-full h-dvh overflow-hidden">
+			<Sidebar
+				isOpen={sidebar}
+				selectUser={selectUser}
+				toggleLogoutWarning={toggleLogoutWarning}
+				selectedUser={selectedUser}
+				friends={friends}
+				toggleAddPeers={toggleAddPeers}
+				loadingFriends={loading}
+			/>
 
 			{selectedUser ? (
 				<Chat
