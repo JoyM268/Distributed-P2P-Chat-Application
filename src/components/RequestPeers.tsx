@@ -8,6 +8,7 @@ import { db } from "@/services/firebase";
 import { ref, update, get, child } from "firebase/database";
 import type { FriendProfile } from "@/types";
 import { Spinner } from "./ui/spinner";
+import { toast } from "sonner";
 
 export default function RequestPeers({
 	requests,
@@ -33,16 +34,15 @@ export default function RequestPeers({
 			const snapshot = await get(usernameRef);
 
 			if (!snapshot.exists()) {
-				console.log("User not found!");
-				setSending(false);
+				toast.error("User not found!");
 				return;
 			}
 
 			const targetUid = snapshot.val();
 
 			if (targetUid === currentUser.uid) {
-				console.log("You cannot add yourself.");
-				setSending(false);
+				toast.info("You cannot add yourself.");
+				setSearch("");
 				return;
 			}
 
@@ -53,8 +53,8 @@ export default function RequestPeers({
 			const friendCheckSnap = await get(friendCheckRef);
 
 			if (friendCheckSnap.exists()) {
-				console.log(`You are already friends with ${usernameInput}.`);
-				setSending(false);
+				toast.info(`You are already friends with ${usernameInput}.`);
+				setSearch("");
 				return;
 			}
 
@@ -65,8 +65,8 @@ export default function RequestPeers({
 			const requestCheckSnap = await get(requestCheckRef);
 
 			if (requestCheckSnap.exists()) {
-				console.log("Request already sent.");
-				setSending(false);
+				toast.info("Request already sent.");
+				setSearch("");
 				return;
 			}
 
@@ -76,11 +76,11 @@ export default function RequestPeers({
 
 			await update(ref(db), updates);
 
-			console.log(`Request sent to ${usernameInput}!`);
+			toast.success(`Request sent to ${usernameInput}`);
 			setSearch("");
 		} catch (error) {
 			console.error("Error sending request:", error);
-			console.log("Failed to send request.");
+			toast.error("Failed to send request.");
 		} finally {
 			setSending(false);
 		}
@@ -94,8 +94,10 @@ export default function RequestPeers({
 		updates[`friend_requests/${currentUser.uid}/${senderUid}`] = null;
 		try {
 			await update(ref(db), updates);
+			toast.success("Friend request accepted.");
 		} catch (error) {
 			console.error("Error accepting friend request:", error);
+			toast.error("Error accepting friend request.");
 		}
 	};
 
@@ -106,8 +108,10 @@ export default function RequestPeers({
 
 		try {
 			await update(ref(db), updates);
+			toast.success("Friend request rejected.");
 		} catch (error) {
 			console.error("Error rejecting friend request:", error);
+			toast.error("Error rejecting friend request.");
 		}
 	};
 
@@ -146,7 +150,7 @@ export default function RequestPeers({
 				)}
 
 				{!loading && requests.length === 0 && (
-					<div className="text-sm text-gray-500 text-center mt-20 sm:mt-5">
+					<div className="text-sm text-gray-500 text-center mt-20">
 						No friend requests.
 					</div>
 				)}

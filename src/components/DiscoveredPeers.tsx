@@ -72,6 +72,12 @@ export default function DiscoveredPeers({
 					</div>
 				)}
 
+				{friends.length !== 0 && userSearch.length === 0 && (
+					<div className="text-sm text-gray-600 text-center mt-24 text-wrap">
+						No results found. Check the spelling or try a different
+						username.
+					</div>
+				)}
 				<div className="flex flex-col gap-2">
 					{userSearch.map((friend) => {
 						const isSelected = friend.uid === selectedFriendId;

@@ -18,6 +18,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import PublicRoutes from "./components/PublicRoutes";
 import Menu from "./components/Menu";
 import { AnimatePresence } from "motion/react";
+import { Toaster } from "./components/ui/sonner";
 
 function App() {
 	const [logoutWarning, setLogoutWarning] = useState<boolean>(false);
@@ -61,6 +62,12 @@ function App() {
 
 	return (
 		<>
+			<Toaster
+				position="top-center"
+				toastOptions={{
+					duration: 3000,
+				}}
+			/>
 			<Routes>
 				<Route element={<ProtectedRoutes />}>
 					<Route
