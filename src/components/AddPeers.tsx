@@ -4,7 +4,6 @@ import {
 	Dialog,
 	DialogClose,
 	DialogContent,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "./ui/dialog";
@@ -13,6 +12,7 @@ import { Label } from "./ui/label";
 import { db } from "@/services/firebase";
 import { ref, update, get, child } from "firebase/database";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export default function AddPeers({
 	addPeers,
@@ -37,16 +37,14 @@ export default function AddPeers({
 			const snapshot = await get(usernameRef);
 
 			if (!snapshot.exists()) {
-				console.log("User not found!");
-				setSending(false);
+				toast.error("User not found!");
 				return;
 			}
 
 			const targetUid = snapshot.val();
 
 			if (targetUid === currentUser.uid) {
-				console.log("You cannot add yourself.");
-				setSending(false);
+				toast.info("You cannot add yourself.");
 				return;
 			}
 
@@ -57,8 +55,9 @@ export default function AddPeers({
 			const friendCheckSnap = await get(friendCheckRef);
 
 			if (friendCheckSnap.exists()) {
-				console.log(`You are already friends with ${usernameInput}.`);
-				setSending(false);
+				toast.info(
+					`You are already friends with ${usernameInput.trim()}.`
+				);
 				return;
 			}
 
@@ -69,8 +68,7 @@ export default function AddPeers({
 			const requestCheckSnap = await get(requestCheckRef);
 
 			if (requestCheckSnap.exists()) {
-				console.log("Request already sent.");
-				setSending(false);
+				toast.info("Request already sent.");
 				return;
 			}
 
@@ -80,11 +78,12 @@ export default function AddPeers({
 
 			await update(ref(db), updates);
 
-			console.log(`Request sent to ${usernameInput}!`);
+			toast.success(`Request sent to ${usernameInput.trim()}!`);
 			setSearch("");
+			setAddPeers(false);
 		} catch (error) {
 			console.error("Error sending request:", error);
-			console.log("Failed to send request.");
+			toast.error("Failed to send request.");
 		} finally {
 			setSending(false);
 		}
@@ -98,35 +97,39 @@ export default function AddPeers({
 						Add Friends
 					</DialogTitle>
 				</DialogHeader>
-				<div className="mt-1 flex flex-col gap-2 mb-2">
-					<Label htmlFor="username">Enter the Username</Label>
-					<Input
-						id="username"
-						placeholder="Username"
-						className="border border-gray-500"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-					/>
-				</div>
-				<DialogFooter>
-					<DialogClose>
+
+				<form onSubmit={handleSendRequest} className="space-y-4">
+					<div className="flex flex-col gap-2">
+						<Label htmlFor="username">Enter the Username</Label>
+						<Input
+							id="username"
+							placeholder="Username"
+							className="border border-gray-500"
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+						/>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<DialogClose asChild>
+							<Button
+								type="button"
+								variant="outline"
+								className="w-full border border-gray-400 cursor-pointer"
+							>
+								Cancel
+							</Button>
+						</DialogClose>
+
 						<Button
-							variant="outline"
-							className="cursor-pointer select-none w-full"
-						>
-							Cancel
-						</Button>
-					</DialogClose>
-					<form onSubmit={handleSendRequest}>
-						<Button
-							className="bg-blue-500 text-white hover:bg-blue-500/85 cursor-pointer select-none w-full"
 							type="submit"
 							disabled={sending}
+							className="w-full bg-blue-500 text-white hover:bg-blue-500/85 cursor-pointer"
 						>
 							{!sending ? "Send" : "Sending..."}
 						</Button>
-					</form>
-				</DialogFooter>
+					</div>
+				</form>
 			</DialogContent>
 		</Dialog>
 	);
