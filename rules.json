@@ -1,23 +1,28 @@
 {
 	"rules": {
 		"users": {
+			".indexOn": ["email", "username"],
 			"$uid": {
 				".read": "auth != null",
 				".write": "auth != null && auth.uid === $uid",
+
 				"email": {
-					".read": false
+					".read": true
 				},
 				"private": {
 					".read": false
 				}
 			}
 		},
+
 		"usernames": {
 			"$username": {
 				".read": true,
-				".write": "auth != null && !data.exists()"
+				".write": "auth != null && (!data.exists() || data.val() === auth.uid)",
+				".validate": "newData.exists() ? newData.val() === auth.uid : true"
 			}
 		},
+
 		"friends": {
 			"$uid": {
 				".read": "auth != null && auth.uid === $uid",
@@ -26,21 +31,23 @@
 				}
 			}
 		},
+
 		"friend_requests": {
 			"$uid": {
 				".read": "auth != null && auth.uid === $uid",
 				"$senderUid": {
-					".read": "auth != null && auth.uid === $senderUid",
 					".write": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)"
 				}
 			}
 		},
+
 		"status": {
 			"$uid": {
 				".read": "auth != null",
 				".write": "auth != null && auth.uid === $uid"
 			}
 		},
+
 		"signaling": {
 			"$receiverUid": {
 				".read": "auth != null && auth.uid === $receiverUid",
