@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import { signInWithEmailAndPassword, auth } from "@/services/firebase";
+import { signInWithEmailAndPassword, auth, db } from "@/services/firebase";
 import { FirebaseError } from "firebase/app";
 import { NavLink } from "react-router-dom";
+import { ref, get, child } from "firebase/database";
 import { toast } from "sonner";
 
 export default function Login({
@@ -12,7 +13,7 @@ export default function Login({
 }: {
 	setMenu: Dispatch<SetStateAction<boolean>>;
 }) {
-	const [email, setEmail] = useState<string>("");
+	const [identifier, setIdentifier] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -23,16 +24,64 @@ export default function Login({
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setLoading(true);
+		if (identifier.trim().length === 0 || password.length === 0) {
+			toast.error("Email/username or password cannot be empty.");
+			setLoading(false);
+			return;
+		}
+
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const isEmail = emailRegex.test(identifier);
+
+		let loginEmail = identifier.trim();
+
 		try {
-			await signInWithEmailAndPassword(auth, email, password);
+			if (!isEmail) {
+				const username = identifier;
+				const dbRef = ref(db);
+				const usernameSnapshot = await get(
+					child(dbRef, `usernames/${username}`)
+				);
+
+				if (!usernameSnapshot.exists()) {
+					throw new Error("Invalid username or password.");
+				}
+
+				const userId = usernameSnapshot.val();
+
+				const userSnapshot = await get(
+					child(dbRef, `users/${userId}/email`)
+				);
+
+				if (!userSnapshot.exists()) {
+					throw new Error("Invalid username or password.");
+				}
+
+				loginEmail = userSnapshot.val();
+			}
+
+			await signInWithEmailAndPassword(auth, loginEmail, password);
 			toast.success("Successfully logged in.");
 		} catch (err) {
+			console.error("Login Error:", err);
+
 			if (err instanceof FirebaseError) {
-				console.log(err.message);
+				if (
+					err.code === "auth/invalid-credential" ||
+					err.code === "auth/user-not-found" ||
+					err.code === "auth/wrong-password"
+				) {
+					toast.error("Invalid username or password.");
+				} else if (err.code === "auth/too-many-requests") {
+					toast.error("Too many failed attempts. Try again later.");
+				} else {
+					toast.error(err.message);
+				}
+			} else if (err instanceof Error) {
+				toast.error(err.message);
 			} else {
-				console.log("Error Occured");
+				toast.error("An unknown error occurred.");
 			}
-			toast.error("An error occured, please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -54,23 +103,24 @@ export default function Login({
 			>
 				<div className="flex flex-col gap-1 ">
 					<Label
-						className="sm:text-base text-sm select-none"
-						htmlFor="email"
+						className="sm:text-base text-sm select-none text-left"
+						htmlFor="identifier"
 					>
-						Email
+						Email/Username
 					</Label>
 					<Input
-						id="email"
-						value={email}
-						placeholder="Email"
+						id="identifier"
+						type="text"
+						value={identifier}
+						placeholder="Email/Username"
 						className="sm:text-base text-sm"
-						onChange={(e) => setEmail(e.target.value)}
+						onChange={(e) => setIdentifier(e.target.value)}
 					/>
 				</div>
 				<div className="flex flex-col gap-1">
 					<Label
 						htmlFor="password"
-						className="sm:text-base text-sm select-none"
+						className="sm:text-base text-sm select-none text-left"
 					>
 						Password
 					</Label>

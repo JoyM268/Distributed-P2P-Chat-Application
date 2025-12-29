@@ -26,27 +26,45 @@ export default function Signup({
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 
+		if (!username || !email || !password || !confirmPassword) {
+			toast.error("All fields are required.");
+			return;
+		}
+
+		if (/[ @.]/.test(username)) {
+			toast.error("Username cannot contain spaces, '@', or '.'");
+			return;
+		}
+
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) {
+			toast.error("Please enter a valid email address.");
+			return;
+		}
+
 		if (password !== confirmPassword) {
-			console.log("Passwords do not match");
+			toast.error("Passwords do not match.");
 			return;
 		}
 
 		setLoading(true);
 
 		const normalizedUsername = username.trim().toLowerCase();
+		const normalizedEmail = email.trim().toLowerCase();
 
 		try {
 			const usernameRef = ref(db, `usernames/${normalizedUsername}`);
-			const snapshot = await get(usernameRef);
+			const usernameSnapshot = await get(usernameRef);
 
-			if (snapshot.exists()) {
+			if (usernameSnapshot.exists()) {
 				toast.error("Username already taken");
+				setLoading(false);
 				return;
 			}
 
 			const userCredential = await createUserWithEmailAndPassword(
 				auth,
-				email,
+				normalizedEmail,
 				password
 			);
 
@@ -63,11 +81,25 @@ export default function Signup({
 			toast.success("Account created successfully.");
 		} catch (err) {
 			if (err instanceof FirebaseError) {
-				console.log(err.message);
+				switch (err.code) {
+					case "auth/email-already-in-use":
+						toast.error("Email is already registered.");
+						break;
+					case "auth/weak-password":
+						toast.error(
+							"Password should be at least 6 characters."
+						);
+						break;
+					case "auth/invalid-email":
+						toast.error("Invalid email address.");
+						break;
+					default:
+						toast.error(err.message);
+				}
 			} else {
 				console.log(err);
+				toast.error("An error occurred, please try again later.");
 			}
-			toast.error("An error occured, please try again later.");
 		} finally {
 			setLoading(false);
 		}
@@ -90,7 +122,7 @@ export default function Signup({
 				<div className="flex flex-col gap-1">
 					<Label
 						htmlFor="username"
-						className="sm:text-base text-sm select-none"
+						className="sm:text-base text-sm select-none text-left"
 					>
 						Username
 					</Label>
@@ -105,7 +137,7 @@ export default function Signup({
 				<div className="flex flex-col gap-1">
 					<Label
 						htmlFor="email"
-						className="sm:text-base text-sm select-none"
+						className="sm:text-base text-sm select-none text-left"
 					>
 						Email
 					</Label>
@@ -120,7 +152,7 @@ export default function Signup({
 				<div className="flex flex-col gap-1">
 					<Label
 						htmlFor="password"
-						className="sm:text-base text-sm select-none"
+						className="sm:text-base text-sm select-none text-left"
 					>
 						Password
 					</Label>
@@ -136,7 +168,7 @@ export default function Signup({
 				<div className="flex flex-col gap-1">
 					<Label
 						htmlFor="confirm"
-						className="sm:text-base text-sm select-none"
+						className="sm:text-base text-sm select-none text-left"
 					>
 						Confirm Password
 					</Label>
