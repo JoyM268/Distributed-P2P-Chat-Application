@@ -4,6 +4,7 @@ import { Input } from "./ui/input";
 import { SendHorizonalIcon } from "lucide-react";
 import type { FriendProfile } from "@/types";
 import { useMemo } from "react";
+import { toast } from "sonner";
 
 function Send({
 	sendMessage,
@@ -34,12 +35,10 @@ function Send({
 						className="relative w-full"
 						onSubmit={(e) => {
 							e.preventDefault();
-							console.log("Attempting to send message:", message);
 							if (message.trim()) {
 								sendMessage(message);
-								console.log("Message sent successfully");
 							} else {
-								console.log("Message is empty, not sending");
+								toast.error("Meessage cannot be empty.");
 							}
 							setMessage("");
 							inputRef.current?.blur();

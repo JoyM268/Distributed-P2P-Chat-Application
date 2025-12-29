@@ -15,12 +15,12 @@ export default function HeroSection({
 		<div className="pt-40 z-0 w-full flex justify-center items-center flex-col gap-4 px-3">
 			<div className="flex flex-col font-bold text-4xl sm:text-6xl text-center gap-1">
 				<h1>Secure.</h1>
-				<h1>Decentralized.</h1>
+				<h1>Distributed.</h1>
 				<h1 className="text-blue-600">Real-Time Chat.</h1>
 			</div>
 			<p className="text-gray-700 text-center sm:text-base text-sm">
-				Peer-to-peer messaging with zero server storage. Your data never
-				touches our servers.
+				Peer-to-peer messaging with zero server storage. Your message
+				data never touches our servers.
 			</p>
 			<div className="flex gap-5">
 				<NavLink
