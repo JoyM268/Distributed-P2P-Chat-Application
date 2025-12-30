@@ -74,7 +74,9 @@ export default function RequestPeers({
 
 			updates[`friend_requests/${targetUid}/${currentUser.uid}`] = true;
 
-			await update(ref(db), updates);
+			await update(ref(db, `friend_requests/${targetUid}`), {
+				[currentUser.uid]: true,
+			});
 
 			toast.success(`Request sent to ${usernameInput}`);
 			setSearch("");

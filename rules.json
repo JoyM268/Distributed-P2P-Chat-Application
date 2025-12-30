@@ -19,15 +19,18 @@
 			"$username": {
 				".read": true,
 				".write": "auth != null && (!data.exists() || data.val() === auth.uid)",
-				".validate": "newData.exists() ? newData.val() === auth.uid : true"
+				".validate": "!newData.exists() || newData.val() === auth.uid"
 			}
 		},
 
 		"friends": {
 			"$uid": {
 				".read": "auth != null && auth.uid === $uid",
+				".write": "auth != null && auth.uid === $uid",
+
 				"$friendUid": {
-					".write": "auth != null && (auth.uid === $uid || auth.uid === $friendUid)"
+					".write": "auth != null && (auth.uid === $uid || auth.uid === $friendUid)",
+					".validate": "!newData.exists() || newData.val() === true"
 				}
 			}
 		},
@@ -35,9 +38,10 @@
 		"friend_requests": {
 			"$uid": {
 				".read": "auth != null && auth.uid === $uid",
+				".write": "auth != null",
+
 				"$senderUid": {
-					".read": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)",
-					".write": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)"
+					".validate": "!newData.exists() || auth.uid === $senderUid || auth.uid === $uid"
 				}
 			}
 		},
@@ -52,8 +56,10 @@
 		"signaling": {
 			"$receiverUid": {
 				".read": "auth != null && auth.uid === $receiverUid",
+				".write": "auth != null",
+
 				"$signalId": {
-					".write": "auth != null"
+					".validate": "newData.exists()"
 				}
 			}
 		}
