@@ -36,6 +36,7 @@
 			"$uid": {
 				".read": "auth != null && auth.uid === $uid",
 				"$senderUid": {
+					".read": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)",
 					".write": "auth != null && (auth.uid === $uid || auth.uid === $senderUid)"
 				}
 			}
